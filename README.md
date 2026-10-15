@@ -31,7 +31,7 @@ Plus three bigger pop-outs under the notch: **notification banners** (click to o
 
 **Hover to open.** Six tabs:
 
-- **Home**: iPhone-style Now Playing (drag the bar to seek, shuffle, repeat, lyrics button) next to today's date and your next event.
+- **Home**: iPhone-style Now Playing (drag the bar to seek, shuffle, repeat, lyrics button) on a panel colored to match the album cover, next to today's date and your next event.
 - **Widgets**: weather, system stats, stocks & crypto, countdowns, or your own script (see below).
 - **Reminders**: check off or add reminders.
 - **Shelf**: drag any file onto the notch to park it. New screenshots and downloads land here automatically. Drag out, double-click to open, right-click for AirDrop.

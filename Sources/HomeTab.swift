@@ -4,6 +4,7 @@ import SwiftUI
 
 struct HomeTab: View {
     @EnvironmentObject var vm: IslandViewModel
+    @EnvironmentObject var music: NowPlayingManager
 
     var body: some View {
         HStack(alignment: .top, spacing: 18) {
@@ -11,11 +12,31 @@ struct HomeTab: View {
                 if vm.showLyrics { LyricsPanel() } else { NowPlayingPanel() }
             }
             .frame(maxWidth: .infinity)
+            .background(AlbumTintBackground(tint: music.hasTrack ? music.tint : nil))
 
             Rectangle().fill(.white.opacity(0.1)).frame(width: 1).frame(maxHeight: .infinity)
 
             DayCard().frame(width: 160)
         }
+    }
+}
+
+/// The album's main color behind the player and lyrics, fading slightly toward the bottom.
+struct AlbumTintBackground: View {
+    let tint: Color?
+
+    var body: some View {
+        ZStack {
+            if let tint {
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    .fill(LinearGradient(colors: [tint, tint.opacity(0.75)],
+                                         startPoint: .top, endPoint: .bottom))
+                    .transition(.opacity)
+            }
+        }
+        .padding(.horizontal, -12)
+        .padding(.vertical, -9)
+        .animation(.easeInOut(duration: 0.6), value: tint)
     }
 }
 

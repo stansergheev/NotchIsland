@@ -41,8 +41,14 @@ final class NowPlayingManager: NSObject, ObservableObject {
     @Published var shuffle = false
     @Published var repeatMode: RepeatMode = .off
     @Published var accent: Color = .white
+    /// The album's main color, darkened so white text stays readable. Nil without artwork.
+    @Published var tint: Color?
     @Published var artwork: NSImage? {
-        didSet { accent = artwork?.vividAverageColor.map { Color(nsColor: $0) } ?? .white }
+        didSet {
+            let base = artwork?.dominantColor
+            accent = base.map { Color(nsColor: $0.tuned(saturation: 1.3, minBrightness: 0.8)) } ?? .white
+            tint = base.map { Color(nsColor: $0.tuned(saturation: 1.15, minBrightness: 0.2, maxBrightness: 0.42)) }
+        }
     }
 
     var hasTrack: Bool { !title.isEmpty }
@@ -288,26 +294,74 @@ final class NowPlayingManager: NSObject, ObservableObject {
 }
 
 extension NSImage {
-    /// Average color of the image, brightened so it stays visible on black.
-    var vividAverageColor: NSColor? {
-        guard let tiff = tiffRepresentation, let input = CIImage(data: tiff) else { return nil }
-        let filter = CIFilter(name: "CIAreaAverage",
-                              parameters: [kCIInputImageKey: input,
-                                           kCIInputExtentKey: CIVector(cgRect: input.extent)])
-        guard let output = filter?.outputImage else { return nil }
+    /// The color that covers the most of the image, favoring vivid colors over
+    /// near-black and near-white backgrounds.
+    var dominantColor: NSColor? {
+        guard let source = cgImage(forProposedRect: nil, context: nil, hints: nil) else { return nil }
+        let side = 32
+        var pixels = [UInt8](repeating: 0, count: side * side * 4)
 
-        var pixel = [UInt8](repeating: 0, count: 4)
-        CIContext(options: [.workingColorSpace: NSNull()])
-            .render(output, toBitmap: &pixel, rowBytes: 4,
-                    bounds: CGRect(x: 0, y: 0, width: 1, height: 1),
-                    format: .RGBA8, colorSpace: nil)
+        let drawn: Bool = pixels.withUnsafeMutableBytes { buffer in
+            guard let context = CGContext(data: buffer.baseAddress, width: side, height: side,
+                                          bitsPerComponent: 8, bytesPerRow: side * 4,
+                                          space: CGColorSpaceCreateDeviceRGB(),
+                                          bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue) else { return false }
+            context.interpolationQuality = .medium
+            context.draw(source, in: CGRect(x: 0, y: 0, width: side, height: side))
+            return true
+        }
+        guard drawn else { return nil }
 
-        let base = NSColor(srgbRed: CGFloat(pixel[0]) / 255,
-                           green: CGFloat(pixel[1]) / 255,
-                           blue: CGFloat(pixel[2]) / 255,
-                           alpha: 1)
-        var h: CGFloat = 0, s: CGFloat = 0, b: CGFloat = 0, a: CGFloat = 0
-        base.getHue(&h, saturation: &s, brightness: &b, alpha: &a)
-        return NSColor(hue: h, saturation: min(s * 1.3, 1), brightness: max(b, 0.8), alpha: 1)
+        struct Bucket {
+            var score: Double = 0
+            var red: Double = 0
+            var green: Double = 0
+            var blue: Double = 0
+            var count: Double = 0
+        }
+        var buckets: [Int: Bucket] = [:]
+
+        for i in stride(from: 0, to: pixels.count, by: 4) {
+            let red = Double(pixels[i])
+            let green = Double(pixels[i + 1])
+            let blue = Double(pixels[i + 2])
+            let high: Double = max(red, max(green, blue))
+            let low: Double = min(red, min(green, blue))
+            let brightness: Double = high / 255
+            let saturation: Double = high > 0 ? (high - low) / high : 0
+
+            var weight: Double = 0.35 + saturation
+            if brightness < 0.12 { weight = 0.05 }                        // near black
+            if brightness > 0.93 && saturation < 0.12 { weight = 0.05 }   // near white
+
+            // Group similar colors: 16 levels per channel.
+            let key = (Int(red) >> 4) << 8 | (Int(green) >> 4) << 4 | (Int(blue) >> 4)
+            var bucket = buckets[key] ?? Bucket()
+            bucket.score += weight
+            bucket.red += red
+            bucket.green += green
+            bucket.blue += blue
+            bucket.count += 1
+            buckets[key] = bucket
+        }
+
+        guard let best = buckets.values.max(by: { $0.score < $1.score }), best.count > 0 else { return nil }
+        return NSColor(srgbRed: CGFloat(best.red / best.count / 255),
+                       green: CGFloat(best.green / best.count / 255),
+                       blue: CGFloat(best.blue / best.count / 255),
+                       alpha: 1)
+    }
+}
+
+extension NSColor {
+    /// Same hue, with saturation scaled and brightness kept within a range.
+    func tuned(saturation scale: CGFloat = 1, minBrightness: CGFloat = 0, maxBrightness: CGFloat = 1) -> NSColor {
+        let color = usingColorSpace(.sRGB) ?? self
+        var hue: CGFloat = 0, sat: CGFloat = 0, bright: CGFloat = 0, alpha: CGFloat = 0
+        color.getHue(&hue, saturation: &sat, brightness: &bright, alpha: &alpha)
+        return NSColor(hue: hue,
+                       saturation: min(sat * scale, 1),
+                       brightness: min(max(bright, minBrightness), maxBrightness),
+                       alpha: 1)
     }
 }
