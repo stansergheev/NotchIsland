@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleExecutable</key>
+    <string>NotchIsland</string>
+    <key>CFBundleIdentifier</key>
+    <string>com.example.notchisland</string>
+    <key>CFBundleName</key>
+    <string>NotchIsland</string>
+    <key>CFBundleDisplayName</key>
+    <string>NotchIsland</string>
+    <key>CFBundlePackageType</key>
+    <string>APPL</string>
+    <key>CFBundleShortVersionString</key>
+    <string>2.0</string>
+    <key>CFBundleVersion</key>
+    <string>2</string>
+    <key>LSMinimumSystemVersion</key>
+    <string>15.0</string>
+    <key>LSUIElement</key>
+    <true/>
+    <key>NSHighResolutionCapable</key>
+    <true/>
+    <key>NSAppleEventsUsageDescription</key>
+    <string>NotchIsland controls Spotify and Music so you can play, pause and skip from the notch.</string>
+    <key>NSRemindersFullAccessUsageDescription</key>
+    <string>NotchIsland shows your open reminders and lets you check them off from the notch.</string>
+    <key>NSRemindersUsageDescription</key>
+    <string>NotchIsland shows your open reminders and lets you check them off from the notch.</string>
+    <key>NSCalendarsFullAccessUsageDescription</key>
+    <string>NotchIsland shows your next calendar event in the notch.</string>
+    <key>NSCalendarsUsageDescription</key>
+    <string>NotchIsland shows your next calendar event in the notch.</string>
+    <key>NSMicrophoneUsageDescription</key>
+    <string>NotchIsland listens while you hold the dictation key, then types what you said.</string>
+    <key>NSSpeechRecognitionUsageDescription</key>
+    <string>NotchIsland turns what you say into text while you hold the dictation key.</string>
+    <key>NSDownloadsFolderUsageDescription</key>
+    <string>NotchIsland puts finished downloads on the shelf in the notch.</string>
+</dict>
+</plist>
