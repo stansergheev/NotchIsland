@@ -68,6 +68,7 @@ final class IslandController {
             .environmentObject(vm.agents)
             .environmentObject(vm.notifications)
             .environmentObject(vm.dictation)
+            .environmentObject(vm.widgets)
 
         let host = IslandHostingView(rootView: root)
         host.sizingOptions = []

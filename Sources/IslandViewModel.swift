@@ -4,11 +4,12 @@ import Combine
 @MainActor
 final class IslandViewModel: ObservableObject {
     enum Tab: String, CaseIterable {
-        case home, reminders, shelf, clipboard, timer, agents
+        case home, widgets, reminders, shelf, clipboard, timer, agents
 
         var icon: String {
             switch self {
             case .home: return "music.note"
+            case .widgets: return "square.grid.2x2"
             case .reminders: return "checklist"
             case .shelf: return "tray.full"
             case .clipboard: return "doc.on.clipboard"
@@ -20,6 +21,7 @@ final class IslandViewModel: ObservableObject {
         var title: String {
             switch self {
             case .home: return "Home"
+            case .widgets: return "Widgets"
             case .reminders: return "Reminders"
             case .shelf: return "Shelf"
             case .clipboard: return "Clipboard"
@@ -54,9 +56,9 @@ final class IslandViewModel: ObservableObject {
         case idle, ears, lyricLine, dictation, notification
     }
 
-    @Published var isExpanded = false
+    @Published var isExpanded = false { didSet { updateWidgetActivity() } }
     @Published var isPinned = false          // stays open while you type a reminder
-    @Published var tab: Tab = .home
+    @Published var tab: Tab = .home { didSet { updateWidgetActivity() } }
     @Published var showLyrics = false
     @Published var notchSize = CGSize(width: 190, height: 32)
     @Published var hasPhysicalNotch = true
@@ -76,6 +78,7 @@ final class IslandViewModel: ObservableObject {
     let notifications = NotificationMonitor()
     let dictation = DictationManager()
     let keyboard = KeyboardTap()
+    let widgets = WidgetManager()
 
     let expandedWidth: CGFloat = 620
     private var flashWork: DispatchWorkItem?
@@ -148,6 +151,11 @@ final class IslandViewModel: ObservableObject {
         }
         flashWork = work
         DispatchQueue.main.asyncAfter(deadline: .now() + seconds, execute: work)
+    }
+
+    /// Widgets only refresh while their tab is showing.
+    private func updateWidgetActivity() {
+        widgets.setActive(isExpanded && tab == .widgets)
     }
 
     func didExpand() {

@@ -32,6 +32,7 @@ Plus three bigger pop-outs under the notch: **notification banners** (click to o
 **Hover to open.** Six tabs:
 
 - **Home**: iPhone-style Now Playing (drag the bar to seek, shuffle, repeat, lyrics button) next to today's date and your next event.
+- **Widgets**: weather, system stats, stocks & crypto, countdowns, or your own script (see below).
 - **Reminders**: check off or add reminders.
 - **Shelf**: drag any file onto the notch to park it. New screenshots and downloads land here automatically. Drag out, double-click to open, right-click for AirDrop.
 - **Clipboard**: your last 30 copies. Click one to copy it again. Kept in memory only, and copies from password managers are skipped.
@@ -65,6 +66,41 @@ To publish an update, raise `CFBundleShortVersionString` in `Info.plist` (for ex
 | Microphone, Speech Recognition | dictation | the first time you hold the dictation key |
 
 **After every update or rebuild, Accessibility has to be turned on again.** Each build has a new signature, so the old approval stops working. When building from source, `build.sh` clears it so macOS asks again.
+
+## Widgets
+
+Open the Widgets tab (the grid icon) and click **+**. Right-click a widget to edit, refresh or remove it. Widgets only refresh while the tab is open.
+
+| Widget | Shows | Data from |
+|---|---|---|
+| Weather | temperature, high and low for a city you pick | [Open-Meteo](https://open-meteo.com) (free, no account) |
+| System stats | CPU, memory, free disk space, network speed | your Mac |
+| Stocks & crypto | price, today's change, and a chart for up to 3 tickers (`AAPL`, `BTC-USD`) | Yahoo Finance's public chart data |
+| Countdown | days, hours or minutes until a date | your Mac |
+| Script | the output of any command you write | your Mac |
+
+**Make your own with a script widget.** It runs a command in zsh every so often (you choose how often, minimum 5 seconds). The first line of output is shown big, and the next two lines small. Some ideas:
+
+```bash
+curl -s "wttr.in/?format=%c+%t"                              # weather without an account
+pmset -g batt | grep -o '[0-9]*%'                             # battery percentage
+osascript -e 'tell application "Mail" to unread count of inbox'   # unread mail
+gh pr list --author @me | wc -l | xargs echo "open PRs:"      # your open pull requests
+```
+
+Only add commands you trust: they run with your permissions.
+
+Your widgets are saved in `~/.notchisland/widgets.json`, so you can also edit them by hand (+ menu → **Open widgets file…**) or copy the file to another Mac. Example:
+
+```json
+[
+  { "kind": "system" },
+  { "kind": "weather", "place": "New York", "latitude": 40.71, "longitude": -74.01 },
+  { "kind": "stocks", "symbols": ["AAPL", "BTC-USD"] },
+  { "kind": "countdown", "title": "Finals", "date": "2026-12-14" },
+  { "kind": "script", "title": "Battery", "command": "pmset -g batt | grep -o '[0-9]*%'", "interval": 60 }
+]
+```
 
 ## Dictation
 

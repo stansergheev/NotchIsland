@@ -387,6 +387,7 @@ struct ExpandedView: View {
             Group {
                 switch vm.tab {
                 case .home: HomeTab()
+                case .widgets: WidgetsTab()
                 case .reminders: RemindersTab()
                 case .shelf: ShelfTab()
                 case .clipboard: ClipboardTab()
@@ -431,7 +432,7 @@ struct TopBar: View {
 
     var body: some View {
         HStack(spacing: 0) {
-            HStack(spacing: 6) {
+            HStack(spacing: 3) {
                 ForEach(IslandViewModel.Tab.allCases, id: \.self) { tab in
                     Button {
                         withAnimation(.snappy) { vm.tab = tab }
@@ -439,7 +440,7 @@ struct TopBar: View {
                         Image(systemName: tab.icon)
                             .font(.system(size: 12, weight: .semibold))
                             .foregroundStyle(vm.tab == tab ? Color.white : Color.white.opacity(0.4))
-                            .frame(width: 24, height: 22)
+                            .frame(width: 22, height: 22)
                             .contentShape(Rectangle())
                     }
                     .buttonStyle(.plain)
