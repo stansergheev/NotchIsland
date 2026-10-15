@@ -52,7 +52,7 @@ cd NotchIsland
 
 That compiles, replaces the copy in Applications and opens it. Use `./build.sh --run` to test without installing, or `./build.sh --dmg` to make the disk image. Needs Xcode or the Command Line Tools (`xcode-select --install`).
 
-Pushing a tag like `v2.0.1` makes GitHub build the disk image on a Mac and publish it as a release.
+To publish an update, raise `CFBundleShortVersionString` in `Info.plist` (for example to `2.0.1`) and push to `main`. GitHub builds the disk image on a Mac and publishes it as a new release.
 
 ## Permissions (first launch)
 
