@@ -1,6 +1,17 @@
-# NotchIsland 2.0
+<p align="center"><img src="Resources/AppIcon-1024.png" width="160" alt="NotchIsland icon"></p>
 
-A Dynamic Island for the MacBook notch, written in SwiftUI, inspired by Halo. Requires macOS 15 or later on Apple silicon.
+# NotchIsland
+
+A Dynamic Island for the MacBook notch, written in SwiftUI, inspired by Halo. Free and open source. Requires macOS 15 or later.
+
+## Download
+
+1. Download **NotchIsland.dmg** from the [latest release](../../releases/latest).
+2. Open it and drag **NotchIsland** into **Applications**.
+3. Open NotchIsland. macOS will say it can't verify the app, because it isn't notarized by Apple. Go to **System Settings → Privacy & Security**, scroll down and click **Open Anyway**. You only do this once.
+4. Turn NotchIsland on under **Privacy & Security → Accessibility** when asked (see Permissions below).
+
+Works on Apple silicon and Intel Macs, with or without a notch.
 
 ## What's in the notch
 
@@ -31,14 +42,17 @@ The ☕ button in the top bar keeps your Mac awake.
 
 **Right-click the notch** (or click the capsule in the menu bar) for settings: lyrics under the notch, notifications, volume HUD, hide in fullscreen, keep awake, dictation key, Connect Claude Code, Quit.
 
-## Build and run
+## Build from source
 
 ```bash
-cd ~/Downloads/NotchIsland
+git clone https://github.com/stansergheev/NotchIsland.git
+cd NotchIsland
 ./build.sh --install
 ```
 
-That compiles, replaces the copy in Applications and opens it. Use `./build.sh --run` to test without installing.
+That compiles, replaces the copy in Applications and opens it. Use `./build.sh --run` to test without installing, or `./build.sh --dmg` to make the disk image. Needs Xcode or the Command Line Tools (`xcode-select --install`).
+
+Pushing a tag like `v2.0.1` makes GitHub build the disk image on a Mac and publish it as a release.
 
 ## Permissions (first launch)
 
@@ -50,7 +64,7 @@ That compiles, replaces the copy in Applications and opens it. Use `./build.sh -
 | Downloads folder | downloads on the shelf | at launch |
 | Microphone, Speech Recognition | dictation | the first time you hold the dictation key |
 
-**After every rebuild, Accessibility has to be turned on again.** Each build has a new signature, so `build.sh` clears the old approval and macOS asks again.
+**After every update or rebuild, Accessibility has to be turned on again.** Each build has a new signature, so the old approval stops working. When building from source, `build.sh` clears it so macOS asks again.
 
 ## Dictation
 
